@@ -7,7 +7,7 @@ public class ValidatorBehavior<TIn, TOut> : IMessageBehavior<TIn, TOut> where TI
 {
     public int BehaviorSequence => 2;
 
-    public async Task<TOut> HandleAsync(TIn request, MessageHandlerDelegate<TOut> next, CancellationToken ct)
+    public async Task<TOut> HandleAsync(TIn request, Func<Task<TOut>> next, CancellationToken ct)
     {
         Console.WriteLine($"{typeof(ValidatorBehavior<,>).Name} -> [BEFORE] Handling {typeof(TIn).Name}");
         var response = await next();

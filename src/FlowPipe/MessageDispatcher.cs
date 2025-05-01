@@ -7,31 +7,65 @@ namespace FlowPipe;
 
 public class MessageDispatcher(IServiceProvider serviceProvider) : IMessageDispatcher
 {
+    // public Task<TResponse> SendAsync<TResponse>(IMessage<TResponse> request, CancellationToken ct = default)
+    // {
+    //     var requestType = request.GetType();
+    //     Type handlerType = typeof(IMessageHandler<,>).MakeGenericType(requestType, typeof(TResponse));
+    //     object handler = serviceProvider.GetRequiredService(handlerType);
+    //
+    //
+    //     var behaviors = serviceProvider
+    //         .GetServices(typeof(IMessageBehavior<,>).MakeGenericType(requestType, typeof(TResponse)))
+    //         .Cast<dynamic>()
+    //         .OrderByDescending(x => x.BehaviorSequence)
+    //         .ToList();
+    //
+    //     // En içte handler olacak şekilde pipeline'ı oluştur
+    //     Func<Task<TResponse>> pipeline = () => ((dynamic)handler).HandleAsync((dynamic)request, ct);
+    //
+    //     foreach (dynamic behavior in behaviors)
+    //     {
+    //         Func<Task<TResponse>> next = pipeline;
+    //         var nextDelegate = new MessageHandlerDelegate<TResponse>(() => next());
+    //
+    //         pipeline = () => behavior.HandleAsync((dynamic)request, nextDelegate, ct);
+    //     }
+    //
+    //     return pipeline();
+    // }
+    
+    
     public Task<TResponse> SendAsync<TResponse>(IMessage<TResponse> request, CancellationToken ct = default)
     {
         var requestType = request.GetType();
-        var handlerType = typeof(IMessageHandler<,>).MakeGenericType(requestType, typeof(TResponse));
-        var handler = serviceProvider.GetRequiredService(handlerType);
+        var method = typeof(MessageDispatcher)
+            .GetMethod(nameof(SendInternal), BindingFlags.NonPublic | BindingFlags.Instance)!
+            .MakeGenericMethod(requestType, typeof(TResponse));
+
+        return (Task<TResponse>)method.Invoke(this, [request, ct])!;
+    }
+
+    private Task<TResponse> SendInternal<TRequest, TResponse>(TRequest request, CancellationToken ct)
+        where TRequest : IMessage<TResponse>
+    {
+        var handler = serviceProvider.GetRequiredService<IMessageHandler<TRequest, TResponse>>();
 
         var behaviors = serviceProvider
-            .GetServices(typeof(IMessageBehavior<,>).MakeGenericType(requestType, typeof(TResponse)))
-            .Cast<dynamic>()
-            .OrderByDescending(x => x.BehaviorSequence)
+            .GetServices<IMessageBehavior<TRequest, TResponse>>()
+            .OrderByDescending(b => b.BehaviorSequence)
             .ToList();
 
-        // En içte handler olacak şekilde pipeline'ı oluştur
-        Func<Task<TResponse>> pipeline = () => ((dynamic)handler).HandleAsync((dynamic)request, ct);
+        Func<Task<TResponse>> pipeline = () => handler.HandleAsync(request, ct);
 
-        foreach (dynamic behavior in behaviors)
+        foreach (var behavior in behaviors)
         {
-            Func<Task<TResponse>> next = pipeline;
-            var nextDelegate = new MessageHandlerDelegate<TResponse>(() => next());
-
-            pipeline = () => behavior.HandleAsync((dynamic)request, nextDelegate, ct);
+            var next = pipeline;
+            pipeline = () => behavior.HandleAsync(request, next, ct);
         }
 
         return pipeline();
     }
+
 }
 
 

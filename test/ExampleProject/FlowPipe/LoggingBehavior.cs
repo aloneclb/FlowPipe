@@ -7,7 +7,7 @@ public class LoggingBehavior<TIn, TOut> : IMessageBehavior<TIn, TOut> where TIn 
 {
     public int BehaviorSequence => 1;
 
-    public async Task<TOut> HandleAsync(TIn request, MessageHandlerDelegate<TOut> next, CancellationToken ct)
+    public async Task<TOut> HandleAsync(TIn request, Func<Task<TOut>> next, CancellationToken ct)
     {
         Console.WriteLine($"{typeof(LoggingBehavior<,>).Name} -> [BEFORE] Handling {typeof(TIn).Name}");
         var response = await next();
