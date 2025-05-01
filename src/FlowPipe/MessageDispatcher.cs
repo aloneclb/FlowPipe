@@ -16,7 +16,7 @@ public class MessageDispatcher(IServiceProvider serviceProvider) : IMessageDispa
         var behaviors = serviceProvider
             .GetServices(typeof(IMessageBehavior<,>).MakeGenericType(requestType, typeof(TResponse)))
             .Cast<dynamic>()
-            .OrderBy(x => x.BehaviorSequence)
+            .OrderByDescending(x => x.BehaviorSequence)
             .ToList();
 
         // En içte handler olacak şekilde pipeline'ı oluştur
@@ -25,7 +25,9 @@ public class MessageDispatcher(IServiceProvider serviceProvider) : IMessageDispa
         foreach (dynamic behavior in behaviors)
         {
             Func<Task<TResponse>> next = pipeline;
-            pipeline = () => behavior.HandleAsync((dynamic)request, ct, next);
+            var nextDelegate = new MessageHandlerDelegate<TResponse>(() => next());
+
+            pipeline = () => behavior.HandleAsync((dynamic)request, nextDelegate, ct);
         }
 
         return pipeline();

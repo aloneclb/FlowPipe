@@ -1,8 +1,15 @@
+using ExampleProject.Features;
+using FlowPipe;
+using FlowPipe.Extensions;
+using Microsoft.AspNetCore.Mvc;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+builder.Services.AddFlowPipe(c => { c.AddAssembly(typeof(Program).Assembly); });
 
 var app = builder.Build();
 
@@ -19,17 +26,17 @@ var summaries = new[]
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
 };
 
-app.MapGet("/weatherforecast", () =>
+
+app.MapGet("/ping", async ([FromServices] IMessageDispatcher messageDispatcher) =>
     {
-        var forecast = Enumerable.Range(1, 5).Select(index =>
-                new WeatherForecast
-                (
-                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                    Random.Shared.Next(-20, 55),
-                    summaries[Random.Shared.Next(summaries.Length)]
-                ))
-            .ToArray();
-        return forecast;
+        var response = await messageDispatcher.SendAsync(new PingRequest()
+        {
+            UserId = 1
+        });
+
+        Console.WriteLine($"Endpoint receive message {response.ServerEndpoint}");
+
+        return "pong";
     })
     .WithName("GetWeatherForecast");
 

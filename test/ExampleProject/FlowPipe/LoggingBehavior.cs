@@ -11,7 +11,7 @@ public class LoggingBehavior<TIn, TOut> : IMessageBehavior<TIn, TOut> where TIn 
     {
         Console.WriteLine($"{typeof(LoggingBehavior<,>).Name} -> [BEFORE] Handling {typeof(TIn).Name}");
         var response = await next();
-        Console.WriteLine($"{typeof(LoggingBehavior<,>).Name} -> [AFTER] Handled {typeof(TIn).Name}");
+        Console.WriteLine($"{typeof(LoggingBehavior<,>).Name} -> [AFTER] Handled {response?.GetType().Name}");
         return response;
     }
 }

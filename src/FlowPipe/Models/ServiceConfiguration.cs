@@ -1,6 +1,21 @@
-﻿namespace FlowPipe.Models;
+﻿using System.Reflection;
+
+namespace FlowPipe.Models;
 
 public class FlowPipeServiceConfiguration
 {
-    // todo: servis configuration props List<Assembly> ...
+    private List<Assembly> AssembliesToScan { get; } = new();
+    public List<Assembly> GetAssemblies() => AssembliesToScan;
+    
+    public FlowPipeServiceConfiguration AddAssembly(Assembly assembly)
+    {
+        AssembliesToScan.Add(assembly);
+        return this;
+    }
+
+    public FlowPipeServiceConfiguration AddAssemblies(params Assembly[] assemblies)
+    {
+        AssembliesToScan.AddRange(assemblies);
+        return this;
+    }
 }
