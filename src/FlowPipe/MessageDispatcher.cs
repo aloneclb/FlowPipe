@@ -7,37 +7,11 @@ namespace FlowPipe;
 
 public class MessageDispatcher(IServiceProvider serviceProvider) : IMessageDispatcher
 {
-    // public Task<TResponse> SendAsync<TResponse>(IMessage<TResponse> request, CancellationToken ct = default)
-    // {
-    //     var requestType = request.GetType();
-    //     Type handlerType = typeof(IMessageHandler<,>).MakeGenericType(requestType, typeof(TResponse));
-    //     object handler = serviceProvider.GetRequiredService(handlerType);
-    //
-    //
-    //     var behaviors = serviceProvider
-    //         .GetServices(typeof(IMessageBehavior<,>).MakeGenericType(requestType, typeof(TResponse)))
-    //         .Cast<dynamic>()
-    //         .OrderByDescending(x => x.BehaviorSequence)
-    //         .ToList();
-    //
-    //     // En içte handler olacak şekilde pipeline'ı oluştur
-    //     Func<Task<TResponse>> pipeline = () => ((dynamic)handler).HandleAsync((dynamic)request, ct);
-    //
-    //     foreach (dynamic behavior in behaviors)
-    //     {
-    //         Func<Task<TResponse>> next = pipeline;
-    //         var nextDelegate = new MessageHandlerDelegate<TResponse>(() => next());
-    //
-    //         pipeline = () => behavior.HandleAsync((dynamic)request, nextDelegate, ct);
-    //     }
-    //
-    //     return pipeline();
-    // }
-    
-    
     public Task<TResponse> SendAsync<TResponse>(IMessage<TResponse> request, CancellationToken ct = default)
     {
         var requestType = request.GetType();
+
+        // Generic method invokes: SendInternal<TRequest, TResponse>
         var method = typeof(MessageDispatcher)
             .GetMethod(nameof(SendInternal), BindingFlags.NonPublic | BindingFlags.Instance)!
             .MakeGenericMethod(requestType, typeof(TResponse));
@@ -52,12 +26,13 @@ public class MessageDispatcher(IServiceProvider serviceProvider) : IMessageDispa
 
         var behaviors = serviceProvider
             .GetServices<IMessageBehavior<TRequest, TResponse>>()
-            .OrderByDescending(b => b.BehaviorSequence)
+            .OrderBy(b => b.BehaviorSequence)
             .ToList();
 
-        Func<Task<TResponse>> pipeline = () => handler.HandleAsync(request, ct);
+        // handler metodumuz en içte olucak şekilde pipeline'ı oluşturuyoruz.
+        MessageHandlerDelegate<TResponse> pipeline = () => handler.HandleAsync(request, ct);
 
-        foreach (var behavior in behaviors)
+        foreach (var behavior in behaviors.AsEnumerable().Reverse())
         {
             var next = pipeline;
             pipeline = () => behavior.HandleAsync(request, next, ct);
@@ -65,42 +40,4 @@ public class MessageDispatcher(IServiceProvider serviceProvider) : IMessageDispa
 
         return pipeline();
     }
-
 }
-
-
-// public class MessageDispatcher(IServiceProvider serviceProvider) : IMessageDispatcher
-// {
-//     public Task<TResponse> SendAsync<TResponse>(IMessage<TResponse> request, CancellationToken ct = default)
-//     {
-//         var requestType = request.GetType();
-//
-//         // Generic method invoke: SendInternal<TRequest, TResponse>
-//         var method = typeof(MessageDispatcher)
-//             .GetMethod(nameof(SendInternal), BindingFlags.NonPublic | BindingFlags.Instance)!
-//             .MakeGenericMethod(requestType, typeof(TResponse));
-//
-//         return (Task<TResponse>)method.Invoke(this, [request, ct])!;
-//     }
-//
-//     private Task<TResponse> SendInternal<TRequest, TResponse>(TRequest request, CancellationToken ct)
-//         where TRequest : IMessage<TResponse>
-//     {
-//         var handler = serviceProvider.GetRequiredService<IMessageHandler<TRequest, TResponse>>();
-//
-//         var behaviors = serviceProvider
-//             .GetServices<IMessageBehavior<TRequest, TResponse>>()
-//             .OrderBy(b => b.BehaviorSequence)
-//             .ToList();
-//
-//         Func<Task<TResponse>> pipeline = () => handler.HandleAsync(request, ct);
-//
-//         foreach (var behavior in behaviors.AsEnumerable().Reverse())
-//         {
-//             var next = pipeline;
-//             pipeline = () => behavior.HandleAsync(request, next, ct);
-//         }
-//
-//         return pipeline();
-//     }
-// }

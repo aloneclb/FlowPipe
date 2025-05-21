@@ -4,18 +4,17 @@ namespace FlowPipe.Models;
 
 public class FlowPipeServiceConfiguration
 {
-    private List<Assembly> AssembliesToScan { get; } = new();
-    public List<Assembly> GetAssemblies() => AssembliesToScan;
-    
-    public FlowPipeServiceConfiguration AddAssembly(Assembly assembly)
+    private List<Assembly> Assemblies { get; set; } = new();
+
+    public void AddAssembly(Assembly assembly)
     {
-        AssembliesToScan.Add(assembly);
-        return this;
+        Assemblies.Add(assembly);
     }
 
-    public FlowPipeServiceConfiguration AddAssemblies(params Assembly[] assemblies)
+    public void AddAssemblies(IEnumerable<Assembly> assemblies)
     {
-        AssembliesToScan.AddRange(assemblies);
-        return this;
+        Assemblies.AddRange(assemblies);
     }
+
+    public List<Assembly> GetAssemblies => Assemblies;
 }

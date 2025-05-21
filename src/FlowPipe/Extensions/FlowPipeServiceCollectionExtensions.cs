@@ -8,50 +8,87 @@ namespace FlowPipe.Extensions;
 
 public static class FlowPipeServiceExtensions
 {
+    /// <summary>
+    /// Adds the FlowPipe service with default configuration.
+    /// </summary>
     public static IServiceCollection AddFlowPipe(this IServiceCollection services)
     {
-        var assembly = Assembly.GetExecutingAssembly();
-        services.AddFlowPipe(x => x.AddAssembly(assembly));
-
-        return services;
+        var serviceConfig = new FlowPipeServiceConfiguration();
+        serviceConfig.AddAssembly(Assembly.GetExecutingAssembly());
+        return services.InjectFlowPipe(serviceConfig);
     }
 
-    public static IServiceCollection AddFlowPipe(this IServiceCollection services,
-        Action<FlowPipeServiceConfiguration> flowPipeConfig)
+    /// <summary>
+    /// Adds the FlowPipe service with a custom configuration.
+    /// </summary>
+    public static IServiceCollection AddFlowPipe(
+        this IServiceCollection services,
+        Action<FlowPipeServiceConfiguration> configuration)
     {
         var serviceConfig = new FlowPipeServiceConfiguration();
-        flowPipeConfig.Invoke(serviceConfig);
-        return services.AddFlowPipe(serviceConfig);
+        configuration.Invoke(serviceConfig);
+        return services.InjectFlowPipe(serviceConfig);
     }
 
-    private static IServiceCollection AddFlowPipe(this IServiceCollection services, FlowPipeServiceConfiguration config)
+    private static IServiceCollection InjectFlowPipe(
+        this IServiceCollection services,
+        FlowPipeServiceConfiguration configuration)
     {
         services.AddScoped<IMessageDispatcher, MessageDispatcher>();
 
-        foreach (var assembly in config.GetAssemblies().Distinct())
-        {
-            var types = assembly.GetTypes();
-
-            foreach (var type in types.Where(t => t is { IsAbstract: false, IsInterface: false }))
-            {
-                var handlerInterfaces = type.GetInterfaces()
-                    .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IMessageHandler<,>));
-
-                // handler inject
-                foreach (var iface in handlerInterfaces)
-                {
-                    services.AddScoped(iface, type);
-                }
-
-                // behavior inject
-                if (type.IsGenericTypeDefinition && type.GetInterfaces().Any(i =>
-                        i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IMessageBehavior<,>)))
-                {
-                    services.AddScoped(typeof(IMessageBehavior<,>), type);
-                }
-            }
-        }
+        ValidateConfiguration(configuration);
+        RegisterHandlersAndBehaviors(services, configuration.GetAssemblies);
 
         return services;
+    }
+
+    private static void ValidateConfiguration(FlowPipeServiceConfiguration configuration)
+    {
+        if (configuration.GetAssemblies.Count == 0)
+        {
+            throw new Exception("FlowPipe -> No assemblies have been added. Please add at least one assembly to scan.");
+        }
+    }
+
+    private static void RegisterHandlersAndBehaviors(IServiceCollection services,
+        IReadOnlyCollection<Assembly> assemblies)
+    {
+        foreach (var assembly in assemblies)
+        {
+            var types = assembly.GetTypes()
+                .Where(t => !t.IsAbstract && !t.IsInterface)
+                .ToList();
+
+            RegisterMessageHandlers(services, types);
+            RegisterGenericBehaviors(services, types);
+        }
+    }
+
+    private static void RegisterMessageHandlers(IServiceCollection services, IList<Type> types)
+    {
+        var handlerTypes = types
+            .SelectMany(t => t.GetInterfaces()
+                .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IMessageHandler<,>))
+                .Select(i => new { Interface = i, Implementation = t }));
+
+        foreach (var handler in handlerTypes)
+        {
+            services.AddScoped(handler.Interface, handler.Implementation);
+        }
+    }
+
+    private static void RegisterGenericBehaviors(IServiceCollection services, IList<Type> types)
+    {
+        var openGenericBehaviors = types
+            .Where(t => t.IsGenericTypeDefinition)
+            .Where(t => t.GetInterfaces().Any(i =>
+                i.IsGenericType &&
+                i.GetGenericTypeDefinition() == typeof(IMessageBehavior<,>)));
+
+        foreach (var openGenericBehavior in openGenericBehaviors)
+        {
+            var interfaceType = typeof(IMessageBehavior<,>);
+            services.AddScoped(interfaceType, openGenericBehavior);
+        }
     }
 }

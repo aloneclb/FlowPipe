@@ -7,6 +7,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "readme", "readme", "{5AD6C9B7-C95F-44CD-A346-5C5200801625}"
 	ProjectSection(SolutionItems) = preProject
 		readme\readme.md = readme\readme.md
+		readme\readme-TR.md = readme\readme-TR.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlowPipe", "src\FlowPipe\FlowPipe.csproj", "{DC3D1927-B75F-4921-934B-0F655203F77A}"
