@@ -1,5 +1,7 @@
 ﻿namespace FlowPipe.Contracts;
 
-public interface IMessage<TResponse>
+public interface IMessage;
+
+public interface IMessage<TResponse> : IMessage
 {
 }

@@ -12,7 +12,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "readme", "readme", "{5AD6C9
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlowPipe", "src\FlowPipe\FlowPipe.csproj", "{DC3D1927-B75F-4921-934B-0F655203F77A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleProject", "test\ExampleProject\ExampleProject.csproj", "{1F31A486-9987-48F4-9B1F-666D97FEEEDA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlowPipe.ExampleAPI", "test\FlowPipe.ExampleAPI\FlowPipe.ExampleAPI.csproj", "{1F31A486-9987-48F4-9B1F-666D97FEEEDA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlowPipe.Benchmarks", "test\FlowPipe.Benchmarks\FlowPipe.Benchmarks.csproj", "{105F9A1B-32EC-407F-8127-1B6B7499DC96}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,6 +24,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{DC3D1927-B75F-4921-934B-0F655203F77A} = {51518AD3-AD7E-4DCF-AF18-44041AB4F74A}
 		{1F31A486-9987-48F4-9B1F-666D97FEEEDA} = {0AF4C33A-BF3B-4FC3-8247-ABA7462437CB}
+		{105F9A1B-32EC-407F-8127-1B6B7499DC96} = {0AF4C33A-BF3B-4FC3-8247-ABA7462437CB}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{DC3D1927-B75F-4921-934B-0F655203F77A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -32,5 +35,9 @@ Global
 		{1F31A486-9987-48F4-9B1F-666D97FEEEDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1F31A486-9987-48F4-9B1F-666D97FEEEDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1F31A486-9987-48F4-9B1F-666D97FEEEDA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{105F9A1B-32EC-407F-8127-1B6B7499DC96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{105F9A1B-32EC-407F-8127-1B6B7499DC96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{105F9A1B-32EC-407F-8127-1B6B7499DC96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{105F9A1B-32EC-407F-8127-1B6B7499DC96}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

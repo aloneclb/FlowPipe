@@ -1,6 +1,6 @@
 ﻿using FlowPipe.Contracts;
 
-namespace ExampleProject.Features;
+namespace FlowPipe.ExampleAPI.Features;
 
 public record PingRequest : IMessage<PingResponse>
 {

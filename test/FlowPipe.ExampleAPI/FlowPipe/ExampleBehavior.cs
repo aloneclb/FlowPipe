@@ -1,8 +1,8 @@
-﻿using ExampleProject.Feature;
-using FlowPipe.Contracts;
+﻿using FlowPipe.Contracts;
 using FlowPipe.Decorators;
+using FlowPipe.ExampleAPI.Feature;
 
-namespace ExampleProject.FlowPipe;
+namespace FlowPipe.ExampleAPI.FlowPipe;
 
 public class ExampleBehavior<TIn, TOut> : IMessageBehavior<TIn, TOut> where TIn : IMessage<TOut>
 {

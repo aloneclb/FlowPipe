@@ -1,5 +1,5 @@
 using System.Reflection;
-using ExampleProject.Feature;
+using FlowPipe.ExampleAPI.Feature;
 using FlowPipe;
 using FlowPipe.Extensions;
 using Microsoft.AspNetCore.Mvc;
