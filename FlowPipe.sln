@@ -6,7 +6,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{0AF4C33A-B
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "readme", "readme", "{5AD6C9B7-C95F-44CD-A346-5C5200801625}"
 	ProjectSection(SolutionItems) = preProject
-		readme\readme.md = readme\readme.md
+		readme\readme.md = readme\readme-EN.md
 		readme\readme-TR.md = readme\readme-TR.md
 	EndProjectSection
 EndProject
