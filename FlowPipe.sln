@@ -16,6 +16,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlowPipe.ExampleAPI", "test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlowPipe.Benchmarks", "test\FlowPipe.Benchmarks\FlowPipe.Benchmarks.csproj", "{105F9A1B-32EC-407F-8127-1B6B7499DC96}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlowPipe.UnitTests", "FlowPipe.UnitTests\FlowPipe.UnitTests.csproj", "{3AC54FC1-B013-4E7B-95DF-A58E085AE027}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,7 @@ Global
 		{DC3D1927-B75F-4921-934B-0F655203F77A} = {51518AD3-AD7E-4DCF-AF18-44041AB4F74A}
 		{1F31A486-9987-48F4-9B1F-666D97FEEEDA} = {0AF4C33A-BF3B-4FC3-8247-ABA7462437CB}
 		{105F9A1B-32EC-407F-8127-1B6B7499DC96} = {0AF4C33A-BF3B-4FC3-8247-ABA7462437CB}
+		{3AC54FC1-B013-4E7B-95DF-A58E085AE027} = {0AF4C33A-BF3B-4FC3-8247-ABA7462437CB}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{DC3D1927-B75F-4921-934B-0F655203F77A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -39,5 +42,9 @@ Global
 		{105F9A1B-32EC-407F-8127-1B6B7499DC96}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{105F9A1B-32EC-407F-8127-1B6B7499DC96}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{105F9A1B-32EC-407F-8127-1B6B7499DC96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3AC54FC1-B013-4E7B-95DF-A58E085AE027}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AC54FC1-B013-4E7B-95DF-A58E085AE027}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3AC54FC1-B013-4E7B-95DF-A58E085AE027}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3AC54FC1-B013-4E7B-95DF-A58E085AE027}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
