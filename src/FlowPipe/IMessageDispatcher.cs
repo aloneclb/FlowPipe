@@ -4,5 +4,5 @@ namespace FlowPipe;
 
 public interface IMessageDispatcher
 {
-    Task<TResponse> SendAsync<TResponse>(IMessage<TResponse> request, CancellationToken ct = default);
+    Task<TResponse> SendAsync<TResponse>(IMessage<TResponse> request, CancellationToken ct = default, bool pipelineActive = true);
 }

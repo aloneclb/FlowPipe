@@ -7,7 +7,8 @@ namespace FlowPipe;
 
 public class MessageDispatcher(IServiceProvider serviceProvider) : IMessageDispatcher
 {
-    public Task<TResponse> SendAsync<TResponse>(IMessage<TResponse> request, CancellationToken ct = default)
+    public Task<TResponse> SendAsync<TResponse>(IMessage<TResponse> request, CancellationToken ct = default,
+        bool pipelineActive = true)
     {
         Type requestType = request.GetType();
 
@@ -16,26 +17,29 @@ public class MessageDispatcher(IServiceProvider serviceProvider) : IMessageDispa
             .GetMethod(nameof(SendInternal), BindingFlags.NonPublic | BindingFlags.Instance)!
             .MakeGenericMethod(requestType, typeof(TResponse));
 
-        return (Task<TResponse>)method.Invoke(this, [request, ct])!;
+        return (Task<TResponse>)method.Invoke(this, [request, pipelineActive, ct])!;
     }
 
-    private Task<TResponse> SendInternal<TRequest, TResponse>(TRequest request, CancellationToken ct)
+    private Task<TResponse> SendInternal<TRequest, TResponse>(TRequest request, bool pipelineActive, CancellationToken ct)
         where TRequest : IMessage<TResponse>
     {
         var handler = serviceProvider.GetRequiredService<IMessageHandler<TRequest, TResponse>>();
-
-        var behaviors = serviceProvider
-            .GetServices<IMessageBehavior<TRequest, TResponse>>()
-            .OrderBy(b => b.BehaviorSequence)
-            .ToList();
-
+        
         // handler metodumuz en içte olucak şekilde pipeline'ı oluşturuyoruz.
         MessageHandlerDelegate<TResponse> pipeline = () => handler.HandleAsync(request, ct);
 
-        foreach (var behavior in behaviors.AsEnumerable().Reverse())
+        if (pipelineActive)
         {
-            var next = pipeline;
-            pipeline = () => behavior.HandleAsync(request, next, ct);
+            var behaviors = serviceProvider
+                .GetServices<IMessageBehavior<TRequest, TResponse>>()
+                .OrderBy(b => b.BehaviorSequence)
+                .ToList();
+
+            foreach (var behavior in behaviors.AsEnumerable().Reverse())
+            {
+                var next = pipeline;
+                pipeline = () => behavior.HandleAsync(request, next, ct);
+            }
         }
 
         return pipeline();

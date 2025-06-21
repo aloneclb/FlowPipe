@@ -27,7 +27,7 @@ app.MapPost("/weatherforecast", async (
         [FromBody] PingRequest request,
         [FromServices] IMessageDispatcher dispatcher) =>
     {
-        var response = await dispatcher.SendAsync(request);
+        var response = await dispatcher.SendAsync(request, CancellationToken.None, false);
         return response;
     })
     .WithName("Ping Service");
