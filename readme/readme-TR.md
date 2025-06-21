@@ -36,7 +36,6 @@ public class PingRequest : IMessage<PingResponse>
 {
     public int No { get; set; }
 }
-
 ```
 
 ```csharp
@@ -68,7 +67,7 @@ public class PingRequestHandler : IMessageHandler<PingRequest, PingResponse>
 ```csharp
 public class ExampleBehavior<TIn, TOut> : IMessageBehavior<TIn, TOut> where TIn : IMessage<TOut>
 {
-public int BehaviorSequence => 2;
+    public int BehaviorSequence => 2;
 
     public async Task<TOut> HandleAsync(TIn request, MessageHandlerDelegate<TOut> next, CancellationToken ct)
     {
@@ -94,7 +93,6 @@ public int BehaviorSequence => 2;
 ### Dispatcher Kullanım Örneği
 
 ```csharp
-
 app.MapPost("/weatherforecast", async (
         [FromBody] PingRequest request,
         [FromServices] IMessageDispatcher dispatcher) =>
@@ -103,4 +101,17 @@ app.MapPost("/weatherforecast", async (
     return response;
 })
 .WithName("Ping Service");
+```
+
+### Dispatcher Kullanım Örneği 2 (Pipeline Ignoring)
+
+```csharp
+app.MapPost("/weatherforecast", async (
+        [FromBody] PingRequest request,
+        [FromServices] IMessageDispatcher dispatcher) =>
+    {
+        var response = await dispatcher.SendAsync(request, CancellationToken.None, false);
+        return response;
+    })
+    .WithName("Ping Service");
 ```
